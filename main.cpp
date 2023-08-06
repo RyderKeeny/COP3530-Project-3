@@ -2,6 +2,7 @@
 #include "LinearProbing.h"
 #include <fstream>
 #include <sstream>
+#include <limits>
 
 using namespace std;
 
@@ -11,7 +12,9 @@ int main() {
     linearHashMap mapB(1000);
     string line;
 
+    // Open the weather.csv file
     ifstream file("weather.csv");
+
     if (file.is_open()) {
         
         
@@ -29,14 +32,19 @@ int main() {
                 row.push_back(token);
             }
             
-            // Parse the needed values from each row
-            string precipitation = row[0];
-            string dateFull = row[1];
-            string city = row[5];
-            string minTemp = row[11];
-            string maxTemp = row[10];
-            string windSpeed = row[13];
+            if (row.size() < 15) { // Change the number to match your column count
+                continue; // Skip this iteration of the loop if the row is too short
+            }
 
+            // Parse the needed values from each row
+            string precipitation = row[0];  //0: precipitation
+            string dateFull = row[1];       //1: dateFull
+            string city = row[5];           //5:city
+            string maxTemp = row[11];       //10:max temp
+            string minTemp = row[12];       //11: min temp
+            string windSpeed = row[14];     //13: wind speed
+            // the rows are off becuase theres a comma in row 8 that extends the row value by 1 after it
+            
             // Insert parsed values into the hash maps
             mapA.insert(dateFull + city, precipitation, windSpeed);  
             mapB.insert(dateFull + city, minTemp, maxTemp);  
@@ -49,6 +57,7 @@ int main() {
         cout << "Unable to open the file." << endl;
         return 1;
     }
+
 
     bool interface = true;
     while(interface){    // Interface loop
@@ -66,6 +75,8 @@ int main() {
              << "--------------------------------" << endl;
 
         cin >> input;
+        
+        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear the input buffer
         cout << endl;
 
         if (input == "1"){ // If the user chooses to insert their own findings
@@ -181,4 +192,7 @@ int main() {
 
     return 0;
 }
+
+
+
 
